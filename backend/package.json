@@ -1,0 +1,19 @@
+{
+  "name": "sv-closures-backend",
+  "version": "1.0.0",
+  "description": "Backend server for Sv Closures Product Specification & Technical Drawing Library",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "sqlite3": "^5.1.7",
+    "sql.js": "^1.14.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

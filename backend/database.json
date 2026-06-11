@@ -1,0 +1,96 @@
+{
+  "tables": {
+    "product_specification_technical_dra": [
+      {
+        "id": 1,
+        "Maintains": "SV-CL-28MM",
+        "database": "DRW-2026-001",
+        "closure": "28mm Beverage Cap",
+        "product": "Carbonated Soft Drink Closure Blue",
+        "specifications": "Material: HDPE, Outer Diameter: 28.2mm ± 0.05mm, Inner Seal: 24.8mm ± 0.02mm, Height: 15.2mm ± 0.03mm, Target Weight: 2.15g ± 0.05g, FDA Approved Food Grade.",
+        "status": "Active",
+        "created_at": "2026-06-08T06:00:28.833Z",
+        "updated_at": "2026-06-08T06:00:28.834Z"
+      },
+      {
+        "id": 2,
+        "Maintains": "SV-CL-38MM",
+        "database": "DRW-2026-002",
+        "closure": "38mm Dairy Lid",
+        "product": "Fresh Milk Bottle Closure White",
+        "specifications": "Material: PP, Outer Diameter: 38.5mm ± 0.06mm, Inner Seal: 34.2mm ± 0.03mm, Height: 12.0mm ± 0.04mm, Target Weight: 3.10g ± 0.08g, FDA Approved Food Grade.",
+        "status": "Active",
+        "created_at": "2026-06-08T06:00:28.834Z",
+        "updated_at": "2026-06-08T06:00:28.834Z"
+      },
+      {
+        "id": 3,
+        "Maintains": "SV-CL-30MM",
+        "database": "DRW-2026-003",
+        "closure": "30mm Water Cap",
+        "product": "Mineral Water Cap Light Blue",
+        "specifications": "Material: Organoleptic HDPE, Outer Diameter: 30.1mm ± 0.04mm, Height: 11.5mm ± 0.02mm, Target Weight: 1.65g ± 0.03g, FDA Approved Food Grade.",
+        "status": "Archived",
+        "created_at": "2026-06-08T06:00:28.834Z",
+        "updated_at": "2026-06-08T08:03:17.759Z"
+      },
+      {
+        "id": 4,
+        "Maintains": "SV-CL-20PH",
+        "database": "DRW-2026-004",
+        "closure": "20mm Pharma Seal",
+        "product": "Pharmaceutical Vial Seal Grey",
+        "specifications": "Material: PP / Rubber Liner, Outer Diameter: 20.2mm ± 0.02mm, Height: 7.2mm ± 0.01mm, Target Weight: 0.95g ± 0.02g, USP Class VI Certified Grade.",
+        "status": "Active",
+        "created_at": "2026-06-08T06:00:28.834Z",
+        "updated_at": "2026-06-08T06:00:28.834Z"
+      },
+      {
+        "id": 5,
+        "Maintains": "SV-CL-45IND",
+        "database": "DRW-2026-005",
+        "closure": "45mm Industrial Cap",
+        "product": "Chemical Can Cap Red",
+        "specifications": "Material: High-Density PP, Outer Diameter: 45.8mm ± 0.12mm, Height: 22.0mm ± 0.12mm, Target Weight: 7.50g ± 0.g, Industrial Grade Chemical Resistant.",
+        "status": "Archived",
+        "created_at": "2026-06-08T06:00:28.834Z",
+        "updated_at": "2026-06-08T08:01:15.436Z"
+      },
+      {
+        "id": 6,
+        "Maintains": "SV-CL-20",
+        "database": "DRW-2026-005",
+        "closure": "45mm Industrial Cap",
+        "product": "Chemical Can Cap Red",
+        "specifications": "DIAMETER 20 HEIGHT 0.3MM",
+        "status": "Active",
+        "created_at": "2026-06-08T08:04:55.150Z",
+        "updated_at": "2026-06-08T08:04:55.150Z"
+      }
+    ],
+    "users": [
+      {
+        "id": 1,
+        "username": "admin",
+        "password": "admin",
+        "role": "Quality Manager",
+        "created_at": "2026-06-08T07:48:34.564Z",
+        "updated_at": "2026-06-08T07:48:34.564Z",
+        "email": "admin@svclosures.com"
+      },
+      {
+        "id": 2,
+        "username": "shivabalaji",
+        "email": "shivabalaji2576@gmail.com",
+        "password": "12345",
+        "role": "System Operator",
+        "created_at": "2026-06-08T07:57:33.581Z",
+        "updated_at": "2026-06-08T07:57:33.582Z"
+      }
+    ]
+  },
+  "counters": {
+    "product_specification_technical_dra": 7,
+    "users": 3
+  }
+}
