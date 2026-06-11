@@ -25,7 +25,7 @@ import {
   Lock
 } from 'lucide-react';
 
-const API_BASE = 'http://localhost:5000/api';
+const API_BASE = import.meta.env.VITE_API_BASE || 'https://sv-closures-backend.onrender.com/api';
 
 export default function App() {
   // Authentication State
