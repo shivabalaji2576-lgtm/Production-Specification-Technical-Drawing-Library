@@ -95,6 +95,16 @@ app.post('/api/auth/register', async (req, res) => {
       });
     }
 
+    // Check duplicate email
+    const existingEmail = await dbGet('SELECT * FROM users WHERE email = ?', [email]);
+    if (existingEmail) {
+      return res.status(400).json({
+        success: false,
+        message: `Email '${email}' is already registered.`,
+        code: 400
+      });
+    }
+
     // Insert user with email
     await dbRun(
       'INSERT INTO users (username, email, password, role) VALUES (?, ?, ?, ?)',
