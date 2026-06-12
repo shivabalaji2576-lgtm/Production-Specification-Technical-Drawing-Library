@@ -22,7 +22,8 @@ import {
   User,
   Activity,
   Calendar,
-  Lock
+  Lock,
+  Settings
 } from 'lucide-react';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'https://sv-closures-backend.onrender.com/api';
@@ -30,16 +31,20 @@ const API_BASE = import.meta.env.VITE_API_BASE || 'https://sv-closures-backend.o
 export default function App() {
   // Authentication State
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [authMode, setAuthMode] = useState('login'); // 'login' or 'register'
-  const [loginForm, setLoginForm] = useState({ email: '', password: '' });
-  const [registerForm, setRegisterForm] = useState({ username: '', email: '', password: '', role: 'System Operator' });
+  const [loginForm, setLoginForm] = useState({ username: '', password: '' });
   const [authError, setAuthError] = useState('');
   const [authSuccess, setAuthSuccess] = useState('');
   const [authLoading, setAuthLoading] = useState(false);
   const [user, setUser] = useState(null);
 
+  // Settings Credentials State
+  const [settingsForm, setSettingsForm] = useState({ username: '', password: '', confirmPassword: '' });
+  const [settingsError, setSettingsError] = useState('');
+  const [settingsSuccess, setSettingsSuccess] = useState('');
+  const [settingsLoading, setSettingsLoading] = useState(false);
+
   // Navigation State
-  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'entry-form', 'detail', 'reports', 'inventory'
+  const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard', 'entry-form', 'detail', 'reports', 'settings'
   const [selectedSpecId, setSelectedSpecId] = useState(null);
   
   // Data States
@@ -151,40 +156,55 @@ export default function App() {
     }
   };
 
-  const handleRegister = async (e) => {
+  const handleUpdateProfile = async (e) => {
     e.preventDefault();
-    setAuthError('');
-    setAuthSuccess('');
-    if (!registerForm.username.trim()) {
-      setAuthError('Username is required.');
+    setSettingsError('');
+    setSettingsSuccess('');
+
+    if (settingsForm.username.trim().length < 3) {
+      setSettingsError('Username must be at least 3 characters.');
       return;
     }
-    if (registerForm.password.length < 4) {
-      setAuthError('Password must be at least 4 characters.');
+    if (settingsForm.password.length < 4) {
+      setSettingsError('Password must be at least 4 characters.');
       return;
     }
-    setAuthLoading(true);
+    if (settingsForm.password !== settingsForm.confirmPassword) {
+      setSettingsError('Passwords do not match.');
+      return;
+    }
+
+    setSettingsLoading(true);
     try {
-      const res = await fetch(`${API_BASE}/auth/register`, {
-        method: 'POST',
+      const res = await fetch(`${API_BASE}/auth/update-profile`, {
+        method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(registerForm)
+        body: JSON.stringify({
+          userId: user?.id,
+          username: settingsForm.username,
+          password: settingsForm.password
+        })
       });
       const data = await res.json();
       if (data.success) {
-        setAuthSuccess('Account created! You can now log in.');
-        setAuthMode('login');
-        setLoginForm({ email: registerForm.email, password: '' });
-        setRegisterForm({ username: '', email: '', password: '', role: 'System Operator' });
+        setSettingsSuccess('Credentials updated successfully! Logging you out...');
+        setSettingsForm({ username: '', password: '', confirmPassword: '' });
+        setTimeout(() => {
+          setIsLoggedIn(false);
+          setUser(null);
+          setSettingsSuccess('');
+          setLoginForm({ username: '', password: '' });
+        }, 2000);
       } else {
-        setAuthError(data.message || 'Registration failed.');
+        setSettingsError(data.message || 'Failed to update credentials.');
       }
     } catch (err) {
-      setAuthError('Cannot connect to server. Make sure the backend is running.');
+      setSettingsError('Cannot connect to server. Make sure the backend is running.');
     } finally {
-      setAuthLoading(false);
+      setSettingsLoading(false);
     }
   };
+
 
   const evaluateLiveRules = async () => {
     try {
@@ -380,7 +400,7 @@ export default function App() {
     );
   };
 
-  // Login / Register View
+  // Login View
   if (!isLoggedIn) {
     return (
       <div className="login-wrapper">
@@ -389,24 +409,6 @@ export default function App() {
             <div className="login-logo">SV</div>
             <h2 className="login-title">Sv Closures</h2>
             <p className="login-subtitle">Product Specification & Technical Drawing Library</p>
-          </div>
-
-          {/* Auth Mode Tabs */}
-          <div className="auth-tabs">
-            <button
-              className={`auth-tab ${authMode === 'login' ? 'active' : ''}`}
-              onClick={() => { setAuthMode('login'); setAuthError(''); setAuthSuccess(''); }}
-              type="button"
-            >
-              <Lock className="w-3.5 h-3.5" /> Sign In
-            </button>
-            <button
-              className={`auth-tab ${authMode === 'register' ? 'active' : ''}`}
-              onClick={() => { setAuthMode('register'); setAuthError(''); setAuthSuccess(''); }}
-              type="button"
-            >
-              <User className="w-3.5 h-3.5" /> Create Account
-            </button>
           </div>
 
           {/* Success / Error Messages */}
@@ -422,93 +424,43 @@ export default function App() {
           )}
 
           {/* LOGIN FORM */}
-          {authMode === 'login' && (
-            <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <div className="form-group">
-                <label className="form-label" htmlFor="login-email">Email Address</label>
-                <input 
-                  type="email" 
-                  id="login-email"
-                  className="form-input" 
-                  placeholder="Enter your email address" 
-                  value={loginForm.email}
-                  onChange={(e) => setLoginForm(prev => ({ ...prev, email: e.target.value }))}
-                  required
-                  autoComplete="email"
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label" htmlFor="login-password">Password</label>
-                <input 
-                  type="password" 
-                  id="login-password"
-                  className="form-input" 
-                  placeholder="Enter your password" 
-                  value={loginForm.password}
-                  onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
-                  required
-                  autoComplete="current-password"
-                />
-              </div>
-              <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '0.5rem' }} disabled={authLoading}>
-                {authLoading ? 'Signing in...' : (<>Access Dashboard <ArrowRight className="w-4 h-4" /></>)}
-              </button>
-              <p className="auth-hint">Default: <strong>admin@svclosures.com</strong> / <strong>admin</strong></p>
-            </form>
-          )}
-
-          {/* REGISTER FORM */}
-          {authMode === 'register' && (
-            <form onSubmit={handleRegister} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
-              <div className="form-group">
-                <label className="form-label" htmlFor="reg-username">Username *</label>
-                <input 
-                  type="text" 
-                  id="reg-username"
-                  className="form-input" 
-                  placeholder="Choose a unique username" 
-                  value={registerForm.username}
-                  onChange={(e) => setRegisterForm(prev => ({ ...prev, username: e.target.value }))}
-                  required
-                  autoComplete="username"
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label" htmlFor="reg-email">Email Address *</label>
-                <input 
-                  type="email" 
-                  id="reg-email"
-                  className="form-input" 
-                  placeholder="Enter your email address" 
-                  value={registerForm.email}
-                  onChange={(e) => setRegisterForm(prev => ({ ...prev, email: e.target.value }))}
-                  required
-                  autoComplete="email"
-                />
-              </div>
-              <div className="form-group">
-                <label className="form-label" htmlFor="reg-password">Password * (min. 4 characters)</label>
-                <input 
-                  type="password" 
-                  id="reg-password"
-                  className="form-input" 
-                  placeholder="Create a secure password" 
-                  value={registerForm.password}
-                  onChange={(e) => setRegisterForm(prev => ({ ...prev, password: e.target.value }))}
-                  required
-                  autoComplete="new-password"
-                />
-              </div>
-              <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '0.5rem' }} disabled={authLoading}>
-                {authLoading ? 'Creating Account...' : (<><User className="w-4 h-4" /> Create Account</>)}
-              </button>
-              <p className="auth-hint">Already have an account? <span className="auth-link" onClick={() => { setAuthMode('login'); setAuthError(''); }}>Sign In</span></p>
-            </form>
-          )}
+          <form onSubmit={handleLogin} style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+            <div className="form-group">
+              <label className="form-label" htmlFor="login-username">Username</label>
+              <input 
+                type="text" 
+                id="login-username"
+                className="form-input" 
+                placeholder="Enter username" 
+                value={loginForm.username}
+                onChange={(e) => setLoginForm(prev => ({ ...prev, username: e.target.value }))}
+                required
+                autoComplete="username"
+              />
+            </div>
+            <div className="form-group">
+              <label className="form-label" htmlFor="login-password">Password</label>
+              <input 
+                type="password" 
+                id="login-password"
+                className="form-input" 
+                placeholder="Enter password" 
+                value={loginForm.password}
+                onChange={(e) => setLoginForm(prev => ({ ...prev, password: e.target.value }))}
+                required
+                autoComplete="current-password"
+              />
+            </div>
+            <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '0.5rem' }} disabled={authLoading}>
+              {authLoading ? 'Signing in...' : (<>Access Dashboard <ArrowRight className="w-4 h-4" /></>)}
+            </button>
+            <p className="auth-hint">Default Credentials: <strong>admin</strong> / <strong>admin</strong></p>
+          </form>
         </div>
       </div>
     );
   }
+
 
   return (
     <div className="app-container">
@@ -555,8 +507,22 @@ export default function App() {
                 <BarChart3 className="w-4 h-4" /> Reports & Analytics
               </div>
             </li>
+            <li>
+              <div 
+                className={`nav-item ${currentView === 'settings' ? 'active' : ''}`}
+                onClick={() => {
+                  setSettingsError('');
+                  setSettingsSuccess('');
+                  setSettingsForm({ username: user?.name || '', password: '', confirmPassword: '' });
+                  setCurrentView('settings');
+                }}
+              >
+                <Settings className="w-4 h-4" /> Account Settings
+              </div>
+            </li>
           </ul>
         </nav>
+
 
         {/* User Info Footer */}
         <div className="user-profile">
@@ -608,7 +574,14 @@ export default function App() {
                 <p>Distribution stats, trend indicators, and CSV database exports</p>
               </>
             )}
+            {currentView === 'settings' && (
+              <>
+                <h1>Account Settings</h1>
+                <p>Manage your general credentials and dashboard security options</p>
+              </>
+            )}
           </div>
+
 
           <div className="header-actions">
             <button onClick={exportCSV} className="btn btn-primary">
@@ -1196,7 +1169,7 @@ export default function App() {
                             {/* Completed slice */}
                             <circle 
                               cx="50" cy="50" r="30" fill="none" 
-                              stroke="#3b82f6" strokeWidth="10" 
+                              stroke="#e50914" strokeWidth="10" 
                               strokeDasharray={`${completedDash} ${circ - completedDash}`} 
                               strokeDashoffset={-archivedDash}
                             />
@@ -1210,7 +1183,7 @@ export default function App() {
                             />
 
                             {/* Center Cutout text */}
-                            <circle cx="50" cy="50" r="22" fill="#121826" />
+                            <circle cx="50" cy="50" r="22" fill="#121212" />
                             <text x="50" y="47" textAnchor="middle" fill="#fff" fontSize="9" fontWeight="700">
                               {dashboardStats.total}
                             </text>
@@ -1230,7 +1203,7 @@ export default function App() {
                       <span>Active ({dashboardStats.active})</span>
                     </div>
                     <div className="legend-item">
-                      <div className="legend-color" style={{ backgroundColor: '#3b82f6' }} />
+                      <div className="legend-color" style={{ backgroundColor: '#e50914' }} />
                       <span>Completed ({dashboardStats.completed})</span>
                     </div>
                     <div className="legend-item">
@@ -1238,6 +1211,7 @@ export default function App() {
                       <span>Archived ({dashboardStats.archived})</span>
                     </div>
                   </div>
+
                 </div>
 
                 {/* Chart 2: Compliance rates (Bar Chart) */}
@@ -1303,9 +1277,92 @@ export default function App() {
             </div>
           )}
 
+          {/* VIEW: ACCOUNT SETTINGS */}
+          {currentView === 'settings' && (
+            <div style={{ maxWidth: '600px', margin: '0 auto', width: '100%' }}>
+              <div className="content-card">
+                <h2 className="card-title">Update Credentials</h2>
+                <p style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '1rem' }}>
+                  Update your dashboard username and password. Once changed, you will be signed out and must log in using your new credentials.
+                </p>
+
+                {/* Error / Success Alerts */}
+                {settingsSuccess && (
+                  <div className="auth-msg auth-msg-success" style={{ marginBottom: '1.25rem' }}>
+                    <CheckCircle2 className="w-4 h-4 flex-shrink-0" /> {settingsSuccess}
+                  </div>
+                )}
+                {settingsError && (
+                  <div className="auth-msg auth-msg-error" style={{ marginBottom: '1.25rem' }}>
+                    <XCircle className="w-4 h-4 flex-shrink-0" /> {settingsError}
+                  </div>
+                )}
+
+                <form onSubmit={handleUpdateProfile} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="settings-username">New Username *</label>
+                    <input 
+                      type="text" 
+                      id="settings-username"
+                      className="form-input" 
+                      placeholder="Enter new username" 
+                      value={settingsForm.username}
+                      onChange={(e) => setSettingsForm(prev => ({ ...prev, username: e.target.value }))}
+                      required
+                      autoComplete="off"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="settings-password">New Password * (min. 4 characters)</label>
+                    <input 
+                      type="password" 
+                      id="settings-password"
+                      className="form-input" 
+                      placeholder="Enter new password" 
+                      value={settingsForm.password}
+                      onChange={(e) => setSettingsForm(prev => ({ ...prev, password: e.target.value }))}
+                      required
+                      autoComplete="new-password"
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label" htmlFor="settings-confirm-password">Confirm Password *</label>
+                    <input 
+                      type="password" 
+                      id="settings-confirm-password"
+                      className="form-input" 
+                      placeholder="Confirm new password" 
+                      value={settingsForm.confirmPassword}
+                      onChange={(e) => setSettingsForm(prev => ({ ...prev, confirmPassword: e.target.value }))}
+                      required
+                      autoComplete="new-password"
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '1rem', marginTop: '0.5rem' }}>
+                    <button type="submit" className="btn btn-primary" disabled={settingsLoading}>
+                      {settingsLoading ? 'Saving changes...' : 'Update Credentials'}
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => setCurrentView('dashboard')} 
+                      className="btn btn-secondary"
+                      disabled={settingsLoading}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+
         </div>
       </main>
 
     </div>
   );
 }
+

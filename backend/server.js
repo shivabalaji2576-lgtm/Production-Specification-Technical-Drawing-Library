@@ -128,22 +128,22 @@ app.post('/api/auth/register', async (req, res) => {
 // Auth: Login
 app.post('/api/auth/login', async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, username, password } = req.body;
 
-    const cleanEmail = sanitizeString(email);
-    if (!cleanEmail || !password) {
+    const identifier = sanitizeString(username || email);
+    if (!identifier || !password) {
       return res.status(400).json({
         success: false,
-        message: "Email and password are required.",
+        message: "Username/email and password are required.",
         code: 400
       });
     }
 
-    const user = await dbGet('SELECT * FROM users WHERE email = ?', [cleanEmail]);
+    const user = await dbGet('SELECT * FROM users WHERE username = ? OR email = ?', [identifier, identifier]);
     if (!user || user.password !== password) {
       return res.status(401).json({
         success: false,
-        message: "Invalid email or password.",
+        message: "Invalid username/email or password.",
         code: 401
       });
     }
@@ -152,6 +152,7 @@ app.post('/api/auth/login', async (req, res) => {
       success: true,
       message: "Logged in successfully.",
       user: {
+        id: user.id,
         name: user.username,
         role: user.role
       }
@@ -165,6 +166,66 @@ app.post('/api/auth/login', async (req, res) => {
     });
   }
 });
+
+// Auth: Update Profile (change username/password)
+app.put('/api/auth/update-profile', async (req, res) => {
+  try {
+    const { userId, username, password } = req.body;
+
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        message: "User ID is required.",
+        code: 400
+      });
+    }
+
+    const cleanUsername = sanitizeString(username);
+    if (!cleanUsername || cleanUsername.trim().length < 3) {
+      return res.status(400).json({
+        success: false,
+        message: "Username must be at least 3 characters long.",
+        code: 400
+      });
+    }
+
+    if (!password || password.length < 4) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 4 characters long.",
+        code: 400
+      });
+    }
+
+    // Check duplicate username for other users
+    const duplicateUser = await dbGet('SELECT id FROM users WHERE username = ? AND id != ?', [cleanUsername.trim(), userId]);
+    if (duplicateUser) {
+      return res.status(400).json({
+        success: false,
+        message: `Username '${cleanUsername}' is already taken.`,
+        code: 400
+      });
+    }
+
+    await dbRun(
+      'UPDATE users SET username = ?, password = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?',
+      [cleanUsername.trim(), password, userId]
+    );
+
+    res.status(200).json({
+      success: true,
+      message: "Credentials updated successfully. Please log in with your new credentials."
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Failed to update profile: " + error.message,
+      code: 500
+    });
+  }
+});
+
 
 // 2. Rules engine endpoint (to dry-run validate specs in frontend before submitting)
 app.post('/api/engine/validate', (req, res) => {
