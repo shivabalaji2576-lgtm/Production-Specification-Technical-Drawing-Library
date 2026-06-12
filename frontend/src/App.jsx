@@ -454,7 +454,7 @@ export default function App() {
             <button type="submit" className="btn btn-primary" style={{ width: '100%', marginTop: '0.5rem' }} disabled={authLoading}>
               {authLoading ? 'Signing in...' : (<>Access Dashboard <ArrowRight className="w-4 h-4" /></>)}
             </button>
-            <p className="auth-hint">Default Credentials: <strong>admin</strong> / <strong>admin</strong></p>
+            <p className="auth-hint">Default Credentials: <strong>admin</strong> / <strong>supervisor</strong></p>
           </form>
         </div>
       </div>

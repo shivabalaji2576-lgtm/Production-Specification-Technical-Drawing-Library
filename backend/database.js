@@ -137,7 +137,7 @@ const initDatabase = async () => {
       // Default admin account
       await dbRun(
         `INSERT OR IGNORE INTO users (username, email, password, role) VALUES (?, ?, ?, ?)`,
-        ['admin', 'admin@svclosures.com', 'admin', 'Quality Manager']
+        ['admin', 'admin@svclosures.com', 'supervisor', 'Quality Manager']
       );
       console.log('Seeded default admin user.');
     }
