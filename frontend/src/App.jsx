@@ -233,8 +233,8 @@ export default function App() {
   const validateLocalFields = () => {
     const errors = {};
     if (!formData.Maintains) errors.Maintains = 'Product Code (Maintains) is required.';
-    else if (!/^SV-CL-[A-Z0-9-]+$/i.test(formData.Maintains)) {
-      errors.Maintains = 'Must match format SV-CL-[Alphanumeric]';
+    else if (!/^(SV-CL|SV-BT)-[A-Z0-9-]+$/i.test(formData.Maintains)) {
+      errors.Maintains = 'Must match format SV-CL-[Alphanumeric] or SV-BT-[Alphanumeric]';
     }
 
     if (!formData.database) errors.database = 'Drawing Reference (database) is required.';
@@ -689,7 +689,7 @@ export default function App() {
                         <tr>
                           <th>Product Code (Maintains)</th>
                           <th>Drawing Reference (database)</th>
-                          <th>Dimensions (closure)</th>
+                          <th>Dimensions (closure/bottle)</th>
                           <th>Product Name (product)</th>
                           <th>State (status)</th>
                           <th>Compliance</th>
@@ -793,7 +793,7 @@ export default function App() {
                         id="Maintains"
                         name="Maintains"
                         className="form-input" 
-                        placeholder="e.g., SV-CL-28MM"
+                        placeholder="e.g., SV-CL-28MM or SV-BT-1L"
                         value={formData.Maintains}
                         onChange={handleFormChange}
                         disabled={isEditing} // Product code immutable during edit
@@ -818,13 +818,13 @@ export default function App() {
                     </div>
 
                     <div className="form-group">
-                      <label className="form-label" htmlFor="closure">Closure Type & Dimensions (closure) *</label>
+                      <label className="form-label" htmlFor="closure">Closure/Bottle Dimensions (closure) *</label>
                       <input 
                         type="text" 
                         id="closure"
                         name="closure"
                         className="form-input" 
-                        placeholder="e.g., 28mm Soft Drink Cap"
+                        placeholder="e.g., 28mm Beverage Cap or 1L Bottle Finish"
                         value={formData.closure}
                         onChange={handleFormChange}
                         required
@@ -1008,7 +1008,7 @@ export default function App() {
                       <span className="info-value font-mono text-white">{detailData.specification.database}</span>
                     </div>
                     <div className="info-block">
-                      <span className="info-label">Closure Dimension</span>
+                      <span className="info-label">Closure/Bottle Dimension</span>
                       <span className="info-value text-white">{detailData.specification.closure}</span>
                     </div>
                     <div className="info-block">

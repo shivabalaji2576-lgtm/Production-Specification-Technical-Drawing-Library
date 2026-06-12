@@ -11,8 +11,8 @@ function processSpecification(spec) {
   // 1. Product Code Pattern Rule (Maintains)
   if (!Maintains) {
     errors.push("Product Code (Maintains) is required.");
-  } else if (!/^SV-CL-[A-Z0-9-]+$/i.test(Maintains)) {
-    errors.push("Product Code (Maintains) must match format: SV-CL-[Alphanumeric] (e.g. SV-CL-28MM).");
+  } else if (!/^(SV-CL|SV-BT)-[A-Z0-9-]+$/i.test(Maintains)) {
+    errors.push("Product Code (Maintains) must match format: SV-CL-[Alphanumeric] or SV-BT-[Alphanumeric] (e.g. SV-CL-28MM, SV-BT-1L).");
   }
 
   // 2. Drawing Reference Rule (database)
