@@ -1267,7 +1267,7 @@ export default function App() {
                   
                   <div className="chart-legend" style={{ justifyContent: 'center' }}>
                     <div className="legend-item">
-                      <span className="text-gray-400 text-xs">Quality thresholds: Warnings fire at &gt;0.1mm. Failures block saves at &gt;0.3mm.</span>
+                      <span className="text-gray-400 text-xs">Quality thresholds: Caps warn at &gt;0.10mm / fail at &gt;0.30mm. Bottles warn at &gt;0.25mm / fail at &gt;0.60mm.</span>
                     </div>
                   </div>
                 </div>

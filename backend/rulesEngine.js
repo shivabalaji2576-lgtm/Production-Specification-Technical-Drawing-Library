@@ -51,13 +51,17 @@ function processSpecification(spec) {
       parsedTolerance = `±${maxToleranceFound}mm`;
     }
 
-    // Rule 3: Closure Tolerance Analysis
-    if (maxToleranceFound > 0.1) {
-      warnings.push(`Warning: Tolerance ${parsedTolerance} exceeds standard high-precision threshold of ±0.10mm.`);
+    const isBottle = Maintains && Maintains.toUpperCase().startsWith('SV-BT');
+    const warningLimit = isBottle ? 0.25 : 0.10;
+    const ceilingLimit = isBottle ? 0.60 : 0.30;
+
+    // Rule 3: Tolerance Analysis
+    if (maxToleranceFound > warningLimit) {
+      warnings.push(`Warning: Tolerance ${parsedTolerance} exceeds standard high-precision threshold of ±${warningLimit.toFixed(2)}mm for ${isBottle ? 'Bottle' : 'Cap'}.`);
       complianceStatus = 'Warning';
     }
-    if (maxToleranceFound > 0.3) {
-      errors.push(`Critical: Tolerance ${parsedTolerance} exceeds safety ceiling of ±0.30mm.`);
+    if (maxToleranceFound > ceilingLimit) {
+      errors.push(`Critical: Tolerance ${parsedTolerance} exceeds safety ceiling of ±${ceilingLimit.toFixed(2)}mm for ${isBottle ? 'Bottle' : 'Cap'}.`);
       complianceStatus = 'Failed';
     }
 
