@@ -534,6 +534,16 @@ app.get('/api/dashboard/summary', async (req, res) => {
       FROM product_specification_technical_dra
     `);
 
+    // Inquiry Counts
+    const inquiryTotals = await dbGet(`
+      SELECT 
+        COUNT(*) as total,
+        SUM(CASE WHEN status = 'New' THEN 1 ELSE 0 END) as new,
+        SUM(CASE WHEN status = 'Reviewed' THEN 1 ELSE 0 END) as reviewed,
+        SUM(CASE WHEN status = 'Archived' THEN 1 ELSE 0 END) as archived
+      FROM inquiries
+    `);
+
     // Rules evaluation stats (in memory evaluation to get active alerts)
     const allSpecs = await dbAll('SELECT * FROM product_specification_technical_dra');
     let warningCount = 0;
@@ -553,7 +563,11 @@ app.get('/api/dashboard/summary', async (req, res) => {
         completed: totals.completed || 0,
         archived: totals.archived || 0,
         warnings: warningCount,
-        failed: failedCount
+        failed: failedCount,
+        inquiriesTotal: inquiryTotals ? inquiryTotals.total : 0,
+        inquiriesNew: inquiryTotals ? (inquiryTotals.new || 0) : 0,
+        inquiriesReviewed: inquiryTotals ? (inquiryTotals.reviewed || 0) : 0,
+        inquiriesArchived: inquiryTotals ? (inquiryTotals.archived || 0) : 0
       },
       recentLogs: []
     });
@@ -595,6 +609,117 @@ app.get('/api/reports/summary', async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Failed to generate report summary: " + error.message,
+      code: 500
+    });
+  }
+});
+
+// 10. GET /api/inquiries (Get inquiries with filter)
+app.get('/api/inquiries', async (req, res) => {
+  try {
+    const statusFilter = sanitizeString(req.query.status);
+    let sql = 'SELECT * FROM inquiries';
+    const params = [];
+
+    if (statusFilter && statusFilter !== 'All') {
+      sql += ' WHERE status = ?';
+      params.push(statusFilter);
+    }
+    sql += ' ORDER BY created_at DESC';
+
+    const rows = await dbAll(sql, params);
+    res.status(200).json({
+      success: true,
+      inquiries: rows
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Database error fetching inquiries: " + error.message,
+      code: 500
+    });
+  }
+});
+
+// 11. POST /api/inquiries (Submit an inquiry)
+app.post('/api/inquiries', async (req, res) => {
+  try {
+    const data = sanitizeObject(req.body);
+    const { company_name, contact_person, email, phone, requirement, message } = data;
+
+    if (!company_name || !company_name.trim()) {
+      return res.status(400).json({ success: false, message: "Company name is required.", code: 400 });
+    }
+    if (!contact_person || !contact_person.trim()) {
+      return res.status(400).json({ success: false, message: "Contact person is required.", code: 400 });
+    }
+    if (!email || !email.trim() || !email.includes('@')) {
+      return res.status(400).json({ success: false, message: "A valid email address is required.", code: 400 });
+    }
+    if (!phone || !phone.trim()) {
+      return res.status(400).json({ success: false, message: "Phone number is required.", code: 400 });
+    }
+    if (!requirement || !requirement.trim()) {
+      return res.status(400).json({ success: false, message: "Requirement details are required.", code: 400 });
+    }
+    if (!message || !message.trim()) {
+      return res.status(400).json({ success: false, message: "Message is required.", code: 400 });
+    }
+
+    const result = await dbRun(
+      `INSERT INTO inquiries (company_name, contact_person, email, phone, requirement, message)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [company_name.trim(), contact_person.trim(), email.trim(), phone.trim(), requirement.trim(), message.trim()]
+    );
+
+    res.status(201).json({
+      success: true,
+      id: result.lastID,
+      message: "Inquiry submitted successfully."
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Database error during inquiry submission: " + error.message,
+      code: 500
+    });
+  }
+});
+
+// 12. PATCH /api/inquiries/:id/status (Change inquiry status)
+app.patch('/api/inquiries/:id/status', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const status = sanitizeString(req.body.status);
+
+    if (!['New', 'Reviewed', 'Archived'].includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid status value. Allowed: New, Reviewed, Archived",
+        code: 400
+      });
+    }
+
+    const currentInquiry = await dbGet('SELECT * FROM inquiries WHERE id = ?', [id]);
+    if (!currentInquiry) {
+      return res.status(404).json({
+        success: false,
+        message: "Inquiry not found.",
+        code: 404
+      });
+    }
+
+    await dbRun('UPDATE inquiries SET status = ? WHERE id = ?', [status, id]);
+
+    res.status(200).json({
+      success: true,
+      message: "Inquiry status updated successfully.",
+      currentStatus: status
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: "Database error updating inquiry status: " + error.message,
       code: 500
     });
   }

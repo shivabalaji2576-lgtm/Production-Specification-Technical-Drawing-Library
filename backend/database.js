@@ -88,6 +88,20 @@ const createSchema = () => {
           created_at      TEXT    NOT NULL DEFAULT (datetime('now')),
           updated_at      TEXT    NOT NULL DEFAULT (datetime('now'))
         )
+      `, (err) => { if (err) return reject(err); });
+
+      db.run(`
+        CREATE TABLE IF NOT EXISTS inquiries (
+          id             INTEGER PRIMARY KEY AUTOINCREMENT,
+          company_name   TEXT    NOT NULL,
+          contact_person TEXT    NOT NULL,
+          email          TEXT    NOT NULL,
+          phone          TEXT    NOT NULL,
+          requirement    TEXT    NOT NULL,
+          message        TEXT    NOT NULL,
+          status         TEXT    NOT NULL DEFAULT 'New',
+          created_at     TEXT    NOT NULL DEFAULT (datetime('now'))
+        )
       `, (err) => {
         if (err) return reject(err);
         resolve();
