@@ -1,7 +1,7 @@
 import React from 'react';
 import { Database, CheckCircle2, AlertTriangle } from 'lucide-react';
 
-export const ReportsView = ({ dashboardStats }) => {
+const ReportsView = ({ dashboardStats }) => {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
       
@@ -55,7 +55,6 @@ export const ReportsView = ({ dashboardStats }) => {
                 const completedPct = (dashboardStats.completed / total) * 100;
                 const archivedPct = (dashboardStats.archived / total) * 100;
 
-                // Stroke dashes calculations
                 const circ = 2 * Math.PI * 30; // Radius = 30
                 const activeDash = (activePct / 100) * circ;
                 const completedDash = (completedPct / 100) * circ;
@@ -63,10 +62,8 @@ export const ReportsView = ({ dashboardStats }) => {
 
                 return (
                   <>
-                    {/* Outer glowing glow ring */}
                     <circle cx="50" cy="50" r="38" fill="none" stroke="rgba(99, 102, 241, 0.04)" strokeWidth="6" />
                     
-                    {/* Archived slice */}
                     <circle 
                       cx="50" cy="50" r="30" fill="none" 
                       stroke="#6b7280" strokeWidth="10" 
@@ -74,7 +71,6 @@ export const ReportsView = ({ dashboardStats }) => {
                       strokeDashoffset={0}
                     />
                     
-                    {/* Completed slice */}
                     <circle 
                       cx="50" cy="50" r="30" fill="none" 
                       stroke="#e50914" strokeWidth="10" 
@@ -82,7 +78,6 @@ export const ReportsView = ({ dashboardStats }) => {
                       strokeDashoffset={-archivedDash}
                     />
                     
-                    {/* Active slice */}
                     <circle 
                       cx="50" cy="50" r="30" fill="none" 
                       stroke="#10b981" strokeWidth="10" 
@@ -90,7 +85,6 @@ export const ReportsView = ({ dashboardStats }) => {
                       strokeDashoffset={-(archivedDash + completedDash)}
                     />
 
-                    {/* Center Cutout text */}
                     <circle cx="50" cy="50" r="22" fill="#121212" />
                     <text x="50" y="47" textAnchor="middle" fill="#fff" fontSize="9" fontWeight="700">
                       {dashboardStats.total}
@@ -104,7 +98,6 @@ export const ReportsView = ({ dashboardStats }) => {
             </svg>
           </div>
           
-          {/* Legend */}
           <div className="chart-legend">
             <div className="legend-item">
               <div className="legend-color" style={{ backgroundColor: '#10b981' }} />
@@ -135,7 +128,6 @@ export const ReportsView = ({ dashboardStats }) => {
 
               return (
                 <div style={{ width: '100%', padding: '0 1.5rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                  {/* Passed Bar */}
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '0.25rem' }}>
                       <span>Passed Safety Standards</span>
@@ -146,7 +138,6 @@ export const ReportsView = ({ dashboardStats }) => {
                     </div>
                   </div>
 
-                  {/* Warning Bar */}
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '0.25rem' }}>
                       <span>Minor Tolerance Warnings (&gt;0.1mm)</span>
@@ -157,7 +148,6 @@ export const ReportsView = ({ dashboardStats }) => {
                     </div>
                   </div>
 
-                  {/* Failure Bar */}
                   <div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.8rem', marginBottom: '0.25rem' }}>
                       <span>Critical Safety Failures (&gt;0.3mm)</span>
@@ -184,3 +174,5 @@ export const ReportsView = ({ dashboardStats }) => {
     </div>
   );
 };
+
+export default ReportsView;

@@ -9,9 +9,9 @@ import {
   Edit, 
   Activity 
 } from 'lucide-react';
-import { ComplianceBadge } from './ComplianceBadge';
+import ComplianceBadge from './ComplianceBadge';
 
-export const DashboardView = ({
+const DashboardView = ({
   dashboardStats,
   search,
   setSearch,
@@ -208,3 +208,5 @@ export const DashboardView = ({
     </>
   );
 };
+
+export default DashboardView;

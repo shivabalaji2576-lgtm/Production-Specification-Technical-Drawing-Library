@@ -1,7 +1,7 @@
 import React from 'react';
 import { CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
 
-export const ComplianceBadge = ({ status }) => {
+const ComplianceBadge = ({ status }) => {
   if (status === 'Passed') {
     return (
       <span className="badge badge-pass">
@@ -22,3 +22,5 @@ export const ComplianceBadge = ({ status }) => {
     </span>
   );
 };
+
+export default ComplianceBadge;

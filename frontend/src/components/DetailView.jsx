@@ -1,8 +1,8 @@
 import React from 'react';
 import { Edit, Activity } from 'lucide-react';
-import { ComplianceBadge } from './ComplianceBadge';
+import ComplianceBadge from './ComplianceBadge';
 
-export const DetailView = ({
+const DetailView = ({
   detailData,
   handleEditSpec,
   handleStatusChange
@@ -128,3 +128,5 @@ export const DetailView = ({
     </div>
   );
 };
+
+export default DetailView;

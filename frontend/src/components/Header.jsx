@@ -1,7 +1,7 @@
 import React from 'react';
 import { FileSpreadsheet } from 'lucide-react';
 
-export const Header = ({ currentView, isEditing, exportCSV }) => {
+const Header = ({ currentView, isEditing, exportCSV }) => {
   return (
     <header className="top-header">
       <div className="header-title-section">
@@ -45,3 +45,5 @@ export const Header = ({ currentView, isEditing, exportCSV }) => {
     </header>
   );
 };
+
+export default Header;

@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Sidebar } from './components/Sidebar';
-import { Header } from './components/Header';
-import { LoginView } from './components/LoginView';
-import { DashboardView } from './components/DashboardView';
-import { EntryFormView } from './components/EntryFormView';
-import { DetailView } from './components/DetailView';
-import { ReportsView } from './components/ReportsView';
-import { SettingsView } from './components/SettingsView';
+import Sidebar from './components/Sidebar';
+import Header from './components/Header';
+import LoginView from './components/LoginView';
+import DashboardView from './components/DashboardView';
+import EntryFormView from './components/EntryFormView';
+import DetailView from './components/DetailView';
+import ReportsView from './components/ReportsView';
+import SettingsView from './components/SettingsView';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'https://sv-closures-backend.onrender.com/api';
 

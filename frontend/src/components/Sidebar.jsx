@@ -1,7 +1,7 @@
 import React from 'react';
 import { Database, PlusCircle, BarChart3, Settings, LogOut } from 'lucide-react';
 
-export const Sidebar = ({
+const Sidebar = ({
   currentView,
   setCurrentView,
   isEditing,
@@ -94,3 +94,5 @@ export const Sidebar = ({
     </aside>
   );
 };
+
+export default Sidebar;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { CheckCircle2, XCircle } from 'lucide-react';
 
-export const SettingsView = ({
+const SettingsView = ({
   settingsSuccess,
   settingsError,
   settingsForm,
@@ -91,3 +91,5 @@ export const SettingsView = ({
     </div>
   );
 };
+
+export default SettingsView;

@@ -1,8 +1,8 @@
 import React from 'react';
 import { Activity, CheckCircle2, XCircle, AlertTriangle } from 'lucide-react';
-import { ComplianceBadge } from './ComplianceBadge';
+import ComplianceBadge from './ComplianceBadge';
 
-export const EntryFormView = ({
+const EntryFormView = ({
   isEditing,
   formData,
   handleFormChange,
@@ -207,3 +207,5 @@ export const EntryFormView = ({
     </div>
   );
 };
+
+export default EntryFormView;

@@ -1,7 +1,7 @@
 import React from 'react';
 import { CheckCircle2, XCircle, ArrowRight } from 'lucide-react';
 
-export const LoginView = ({
+const LoginView = ({
   loginForm,
   setLoginForm,
   handleLogin,
@@ -67,3 +67,5 @@ export const LoginView = ({
     </div>
   );
 };
+
+export default LoginView;
