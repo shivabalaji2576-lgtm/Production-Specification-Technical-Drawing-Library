@@ -10,7 +10,7 @@ import { SettingsView } from './components/SettingsView';
 
 const API_BASE = import.meta.env.VITE_API_BASE || 'https://sv-closures-backend.onrender.com/api';
 
-export default function App() {
+function App() {
   // Authentication State
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [loginForm, setLoginForm] = useState({ username: 'admin', password: 'supervisor' });
@@ -467,3 +467,5 @@ export default function App() {
     </div>
   );
 }
+
+export default App;
