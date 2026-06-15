@@ -22,7 +22,7 @@ function HomePage({ setActiveTab }) {
           </div>
         </div>
         <div className="hero-image-box">
-          <img src="/factory_floor.png" alt="SV Closures Factory Floor" className="hero-image" />
+          <img src={`${import.meta.env.BASE_URL}factory_floor.png`} alt="SV Closures Factory Floor" className="hero-image" />
           <div className="glass-stats-overlay">
             <div className="stat-item">
               <span className="stat-number">50M+</span>

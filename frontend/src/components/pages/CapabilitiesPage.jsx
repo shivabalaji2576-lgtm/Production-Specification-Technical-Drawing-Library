@@ -52,7 +52,7 @@ function CapabilitiesPage() {
           </div>
         </div>
         <div className="infra-image-container">
-          <img src="/quality_lab.png" alt="SV Closures Quality Testing Lab" className="infra-image" />
+          <img src={`${import.meta.env.BASE_URL}quality_lab.png`} alt="SV Closures Quality Testing Lab" className="infra-image" />
         </div>
       </div>
     </section>
