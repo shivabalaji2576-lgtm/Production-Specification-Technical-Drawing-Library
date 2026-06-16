@@ -19,8 +19,28 @@ const navigationItems = [
   { id: 'contact', label: 'Contact Us' }
 ];
 
+const getTabFromPath = () => {
+  const basePath = import.meta.env.BASE_URL || '/';
+  let path = window.location.pathname;
+  if (path.startsWith(basePath)) {
+    path = path.slice(basePath.length);
+  }
+  path = path.replace(/^\/|\/$/g, '');
+  const tabExists = navigationItems.some(item => item.id === path);
+  return tabExists ? path : 'home';
+};
+
 function Website() {
-  const [activeTab, setActiveTab] = useState('home');
+  const [activeTab, setActiveTabState] = useState(getTabFromPath);
+
+  const setActiveTab = (tabId) => {
+    const basePath = import.meta.env.BASE_URL || '/';
+    const cleanTab = tabId === 'home' ? '' : tabId;
+    const newPath = `${basePath}${cleanTab}`;
+    window.history.pushState(null, '', newPath);
+    setActiveTabState(tabId);
+  };
+
   const [products, setProducts] = useState([]);
   const [productsLoading, setProductsLoading] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -38,12 +58,27 @@ function Website() {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
 
-  // Fetch products when tab becomes 'products'
+  // Fetch products and update title when tab changes
   useEffect(() => {
     if (activeTab === 'products') {
       fetchActiveProducts();
     }
+    const matchedItem = navigationItems.find(item => item.id === activeTab);
+    if (matchedItem) {
+      document.title = `${matchedItem.label} | SV Closures`;
+    } else {
+      document.title = 'SV Closures';
+    }
   }, [activeTab]);
+
+  // Handle popstate (browser back/forward navigation)
+  useEffect(() => {
+    const handlePopState = () => {
+      setActiveTabState(getTabFromPath());
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const fetchActiveProducts = async () => {
     setProductsLoading(true);

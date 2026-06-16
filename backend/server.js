@@ -1,10 +1,29 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const nodemailer = require('nodemailer');
 const { db, dbRun, dbAll, dbGet, initDatabase } = require('./database');
 const { processSpecification } = require('./rulesEngine');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+// Initialize SMTP Transporter
+let transporter = null;
+if (process.env.SMTP_USER && process.env.SMTP_PASS) {
+  transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: parseInt(process.env.SMTP_PORT || '587'),
+    secure: process.env.SMTP_SECURE === 'true',
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS
+    }
+  });
+  console.log('SMTP email transporter configured.');
+} else {
+  console.warn('Warning: SMTP_USER and SMTP_PASS are not set. Email notifications for inquiries are disabled.');
+}
 
 app.use(cors());
 app.use(express.json());
@@ -671,6 +690,64 @@ app.post('/api/inquiries', async (req, res) => {
        VALUES (?, ?, ?, ?, ?, ?)`,
       [company_name.trim(), contact_person.trim(), email.trim(), phone.trim(), requirement.trim(), message.trim()]
     );
+
+    // Send email alert if transporter is configured
+    if (transporter) {
+      try {
+        const toEmail = process.env.INQUIRY_TO_EMAIL || 'ANIRUDDHP1977@gmail.com';
+        const mailOptions = {
+          from: `"SV Closures Website" <${process.env.SMTP_USER}>`,
+          to: toEmail,
+          subject: `New B2B Inquiry: ${company_name.trim()} - ${requirement.trim()}`,
+          text: `You have received a new B2B inquiry from the SV Closures website:\n\nCompany Name: ${company_name.trim()}\nContact Person: ${contact_person.trim()}\nEmail: ${email.trim()}\nPhone: ${phone.trim()}\nRequirement/Product: ${requirement.trim()}\n\nMessage / Requirements:\n${message.trim()}\n\nSubmitted on: ${new Date().toLocaleString()}\n`,
+          html: `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px;">
+              <h2 style="color: #008080; border-bottom: 2px solid #008080; padding-bottom: 10px; margin-top: 0;">New B2B Inquiry Received</h2>
+              <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+                <tr style="background-color: #f9f9f9;">
+                  <td style="padding: 10px; font-weight: bold; width: 35%; border-bottom: 1px solid #eeeeee;">Company Name:</td>
+                  <td style="padding: 10px; border-bottom: 1px solid #eeeeee;">${company_name.trim()}</td>
+                </tr>
+                <tr>
+                  <td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #eeeeee;">Contact Person:</td>
+                  <td style="padding: 10px; border-bottom: 1px solid #eeeeee;">${contact_person.trim()}</td>
+                </tr>
+                <tr style="background-color: #f9f9f9;">
+                  <td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #eeeeee;">Work Email:</td>
+                  <td style="padding: 10px; border-bottom: 1px solid #eeeeee;"><a href="mailto:${email.trim()}">${email.trim()}</a></td>
+                </tr>
+                <tr>
+                  <td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #eeeeee;">Phone / Mobile:</td>
+                  <td style="padding: 10px; border-bottom: 1px solid #eeeeee;"><a href="tel:${phone.trim()}">${phone.trim()}</a></td>
+                </tr>
+                <tr style="background-color: #f9f9f9;">
+                  <td style="padding: 10px; font-weight: bold; border-bottom: 1px solid #eeeeee;">Requirement / Product:</td>
+                  <td style="padding: 10px; border-bottom: 1px solid #eeeeee;">${requirement.trim()}</td>
+                </tr>
+              </table>
+              <div style="margin-top: 20px; padding: 15px; background-color: #f4fdfd; border-left: 4px solid #008080; border-radius: 4px;">
+                <h4 style="margin-top: 0; margin-bottom: 10px; color: #008080;">Estimated Volume &amp; Details:</h4>
+                <p style="white-space: pre-wrap; margin: 0; line-height: 1.6; color: #333333;">${message.trim()}</p>
+              </div>
+              <p style="font-size: 12px; color: #777777; margin-top: 25px; text-align: center; border-top: 1px solid #eeeeee; padding-top: 15px;">
+                This inquiry was submitted via the SV Closures online portal on ${new Date().toLocaleString()}.
+              </p>
+            </div>
+          `
+        };
+
+        // Asynchronously send email in background without blocking response
+        transporter.sendMail(mailOptions, (error, info) => {
+          if (error) {
+            console.error('Failed to send inquiry email notification:', error);
+          } else {
+            console.log('Inquiry email notification sent successfully:', info.messageId);
+          }
+        });
+      } catch (emailErr) {
+        console.error('Error drafting/triggering email notification:', emailErr);
+      }
+    }
 
     res.status(201).json({
       success: true,
