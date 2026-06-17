@@ -1,7 +1,7 @@
-# Product Specification & Technical Drawing Library
+# SV Closures Website
 **Sv Closures Packaging Solutions**
 
-This repository contains the Product Specification & Technical Drawing Library, built as a working prototype to digitize Sv Closures' packaging closure specifications, technical drawing refs, material standards, and tolerance logs.
+This repository contains the SV Closures Website, built as a working prototype to digitize Sv Closures' packaging closure specifications, technical drawing refs, material standards, and tolerance logs.
 
 ## Tech Stack
 - **Frontend**: React + Vite, Vanilla CSS, Lucide Icons

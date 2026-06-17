@@ -195,7 +195,15 @@ function Website() {
       <main className="public-content-container">
         {activeTab === 'home'         && <HomePage setActiveTab={setActiveTab} />}
         {activeTab === 'about'        && <AboutPage />}
-        {activeTab === 'products'     && <ProductsPage products={products} productsLoading={productsLoading} triggerProductInquiry={triggerProductInquiry} />}
+        {activeTab === 'products'     && (
+          <ProductsPage 
+            products={products} 
+            productsLoading={productsLoading} 
+            triggerProductInquiry={triggerProductInquiry} 
+            apiBase={API_BASE}
+            onRefresh={fetchActiveProducts}
+          />
+        )}
         {activeTab === 'capabilities' && <CapabilitiesPage />}
         {activeTab === 'gallery'      && <GalleryPage />}
         {activeTab === 'contact'      && (

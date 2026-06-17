@@ -64,7 +64,7 @@ app.get('/api/health', (req, res) => {
   try {
     res.status(200).json({
       status: "ok",
-      project: "product-specification-&-techni"
+      project: "sv-closures-website"
     });
   } catch (error) {
     res.status(500).json({

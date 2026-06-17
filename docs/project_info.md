@@ -1,4 +1,4 @@
-# Product Specification & Technical Drawing Library Documentation
+# SV Closures Website Documentation
 
 ## 1. Problem Statement
 Sv Closures is a manufacturing company producing closure products — bottle caps, lids, seals, and specialised closures — for food, beverage, pharmaceutical, and industrial packaging applications. 
@@ -13,7 +13,7 @@ Currently, the company manages product specifications, technical drawings, mater
 ---
 
 ## 2. Project Abstract
-The **Product Specification & Technical Drawing Library** is a digital solution built specifically to solve Sv Closures' manual overhead. It establishes a centralized database tracking specifications (`product_specification_technical_dra`) per product code. 
+The **SV Closures Website** is a digital solution built specifically to solve Sv Closures' manual overhead. It establishes a centralized database tracking specifications (`product_specification_technical_dra`) per product code. 
 
 The system incorporates a **Core Business Logic Processing Engine** which parses specifications and tolerances on-the-fly, flagging deviations or lack of compliance (such as missing FDA certification for food-grade cap applications). With an intuitive, responsive glassmorphic dashboard, staff can search codes, view CAD drawing numbers instantly, and export database files, significantly reducing response times for customer inquiries and eliminating manual quality validation errors on the production floor.
 

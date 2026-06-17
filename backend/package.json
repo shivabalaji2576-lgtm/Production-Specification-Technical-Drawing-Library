@@ -1,7 +1,7 @@
 {
   "name": "sv-closures-backend",
   "version": "1.0.0",
-  "description": "Backend server for Sv Closures Product Specification & Technical Drawing Library",
+  "description": "Backend server for SV Closures Website",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
