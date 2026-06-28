@@ -1,4 +1,3 @@
-import React from 'react';
 import { Cpu, Layers, Eye } from 'lucide-react';
 
 function CapabilitiesPage() {

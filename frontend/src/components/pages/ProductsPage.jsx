@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import { MessageSquare, Plus, X, AlertCircle, AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { MessageSquare, Plus, X, AlertCircle, AlertTriangle, CheckCircle, Info, Lock, User } from 'lucide-react';
 
 // Client-side replica of the rules engine for instant live validation alerts
 const runLocalRulesEngine = (data) => {
   const { type, codeSuffix, database, closure, product, specifications } = data;
-  const maintains = `${type}-${(codeSuffix || '').trim().toUpperCase()}`;
   const errors = [];
   const warnings = [];
 
@@ -109,6 +108,36 @@ const runLocalRulesEngine = (data) => {
 
 function ProductsPage({ products, productsLoading, triggerProductInquiry, apiBase, onRefresh }) {
   const [showAddModal, setShowAddModal] = useState(false);
+
+  // Employee Password Gate State
+  const [showEmployeeAuthModal, setShowEmployeeAuthModal] = useState(false);
+  const [employeeName, setEmployeeName] = useState('');
+  const [employeePassword, setEmployeePassword] = useState('');
+  const [employeeError, setEmployeeError] = useState('');
+  const [isEmployeeVerified, setIsEmployeeVerified] = useState(false);
+
+  const DEFAULT_EMPLOYEE_PASSWORD = 'SVEmployee2026';
+
+  const handleEmployeeAuthSubmit = (e) => {
+    e.preventDefault();
+    setEmployeeError('');
+
+    if (!employeeName.trim()) {
+      setEmployeeError('Employee name is required.');
+      return;
+    }
+
+    if (employeePassword !== DEFAULT_EMPLOYEE_PASSWORD) {
+      setEmployeeError('Invalid employee security password.');
+      return;
+    }
+
+    // Success
+    setIsEmployeeVerified(true);
+    setShowEmployeeAuthModal(false);
+    setShowAddModal(true);
+  };
+
   const [formData, setFormData] = useState({
     type: 'SV-CL',
     codeSuffix: '',
@@ -120,18 +149,10 @@ function ProductsPage({ products, productsLoading, triggerProductInquiry, apiBas
   const [formErrors, setFormErrors] = useState({});
   const [submitLoading, setSubmitLoading] = useState(false);
   const [submitError, setSubmitError] = useState('');
-  const [liveAnalysis, setLiveAnalysis] = useState({
-    isValid: false,
-    errors: [],
-    warnings: [],
-    complianceStatus: 'Passed',
-    parsedTolerance: 'Not specified'
-  });
 
   // Run live rules check as the user inputs details
-  useEffect(() => {
-    const analysis = runLocalRulesEngine(formData);
-    setLiveAnalysis(analysis);
+  const liveAnalysis = useMemo(() => {
+    return runLocalRulesEngine(formData);
   }, [formData]);
 
   const handleInputChange = (e) => {
@@ -214,6 +235,7 @@ function ProductsPage({ products, productsLoading, triggerProductInquiry, apiBas
         setSubmitError(data.message || 'Failed to save specification.');
       }
     } catch (err) {
+      console.error('Error adding product specification:', err);
       setSubmitError('Network error: Ensure the backend server is running and accessible.');
     } finally {
       setSubmitLoading(false);
@@ -227,7 +249,19 @@ function ProductsPage({ products, productsLoading, triggerProductInquiry, apiBas
           <h2 className="section-title">B2B Product Specifications Catalog</h2>
           <p className="section-subtitle">Browse our verified active closures catalog, direct from our production library. Click any product to request a batch quote.</p>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>
+        <button 
+          className="btn btn-primary" 
+          onClick={() => {
+            if (isEmployeeVerified) {
+              setShowAddModal(true);
+            } else {
+              setEmployeeName('');
+              setEmployeePassword('');
+              setEmployeeError('');
+              setShowEmployeeAuthModal(true);
+            }
+          }}
+        >
           <Plus size={16} style={{ marginRight: '6px' }} />
           Add Specification
         </button>
@@ -449,6 +483,83 @@ function ProductsPage({ products, productsLoading, triggerProductInquiry, apiBas
                   disabled={submitLoading || liveAnalysis.complianceStatus === 'Failed'}
                 >
                   {submitLoading ? 'Saving...' : 'Add Specification'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Employee Authorization Gate Modal */}
+      {showEmployeeAuthModal && (
+        <div className="modal-overlay" style={{ zIndex: 1200 }} onClick={() => setShowEmployeeAuthModal(false)}>
+          <div className="modal-container" style={{ maxWidth: '400px' }} onClick={(e) => e.stopPropagation()}>
+            <div className="modal-header">
+              <h3>Employee Authorization</h3>
+              <button className="modal-close-btn" onClick={() => setShowEmployeeAuthModal(false)}>
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleEmployeeAuthSubmit}>
+              <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>
+                  Adding specifications requires employee authorization. Please enter your name and the shared security password.
+                </p>
+
+                {employeeError && (
+                  <div className="live-validation-section" style={{ borderColor: 'rgba(239, 68, 68, 0.4)', backgroundColor: 'rgba(239, 68, 68, 0.08)', margin: 0 }}>
+                    <div className="live-validation-title" style={{ color: '#f87171' }}>
+                      <AlertCircle size={14} /> Authorization Failed
+                    </div>
+                    <p style={{ fontSize: '0.85rem', color: '#f87171', marginTop: '0.25rem' }}>{employeeError}</p>
+                  </div>
+                )}
+
+                <div className="form-group">
+                  <label className="form-label">Employee Name</label>
+                  <div className="input-with-prefix" style={{ position: 'relative' }}>
+                    <User size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b', zIndex: 10 }} />
+                    <input
+                      type="text"
+                      className="form-input"
+                      style={{ paddingLeft: '2.5rem' }}
+                      placeholder="Enter your name"
+                      value={employeeName}
+                      onChange={(e) => setEmployeeName(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label className="form-label">Security Password</label>
+                  <div className="input-with-prefix" style={{ position: 'relative' }}>
+                    <Lock size={16} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b', zIndex: 10 }} />
+                    <input
+                      type="password"
+                      className="form-input"
+                      style={{ paddingLeft: '2.5rem' }}
+                      placeholder="Enter employee password"
+                      value={employeePassword}
+                      onChange={(e) => setEmployeePassword(e.target.value)}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={() => setShowEmployeeAuthModal(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                >
+                  Verify &amp; Continue
                 </button>
               </div>
             </form>

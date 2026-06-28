@@ -1,4 +1,3 @@
-import React from 'react';
 import { Mail, Phone, MapPin, CheckCircle, MessageSquare } from 'lucide-react';
 
 function ContactPage({

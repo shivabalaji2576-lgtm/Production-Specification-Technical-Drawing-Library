@@ -1,4 +1,3 @@
-import React from 'react';
 import { Award, Shield, CheckCircle } from 'lucide-react';
 
 function AboutPage() {

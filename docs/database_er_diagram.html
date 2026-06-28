@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SV Closures - Database ER Diagram Export Portal</title>
+    <!-- Outfit Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --container-bg: #1e293b;
+            --text-color: #f8fafc;
+            --accent-color: #38bdf8;
+            --accent-hover: #0ea5e9;
+            --border-color: #334155;
+        }
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        h1 {
+            margin: 0 0 10px 0;
+            font-weight: 800;
+            color: var(--accent-color);
+            font-size: 2.5rem;
+            letter-spacing: -0.025em;
+        }
+        p {
+            margin: 0;
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+        .actions {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        .btn {
+            background-color: var(--accent-color);
+            color: var(--bg-color);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .btn:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-1.5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.2), 0 4px 6px -4px rgb(0 0 0 / 0.2);
+        }
+        .btn-outline {
+            background-color: transparent;
+            color: var(--accent-color);
+            border: 2px solid var(--accent-color);
+        }
+        .btn-outline:hover {
+            background-color: rgba(56, 189, 248, 0.08);
+            color: var(--accent-color);
+        }
+        .diagram-container {
+            background-color: var(--container-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 40px;
+            width: 90%;
+            max-width: 1200px;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.25), 0 8px 10px -6px rgb(0 0 0 / 0.25);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: auto;
+        }
+        .mermaid {
+            width: 100%;
+            visibility: hidden; /* Hide until initialized */
+        }
+        .loading {
+            position: absolute;
+            color: var(--accent-color);
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>SV Closures Database ER Diagram</h1>
+        <p>Preview the database structure and download high-resolution SVG/PNG image exports</p>
+    </div>
+    
+    <div class="actions">
+        <button class="btn" id="download-svg">Download SVG Diagram</button>
+        <button class="btn btn-outline" id="download-png">Download PNG Image</button>
+    </div>
+
+    <div class="diagram-container">
+        <div id="loader" class="loading">Loading diagram engine...</div>
+        <div class="mermaid" id="diagram">
+            erDiagram
+                users {
+                    INTEGER id PK "AUTOINCREMENT"
+                    TEXT username UK "NOT NULL, Unique"
+                    TEXT email UK "NOT NULL, Unique"
+                    TEXT password "NOT NULL"
+                    TEXT role "NOT NULL"
+                    TEXT created_at "NOT NULL"
+                    TEXT updated_at "NOT NULL"
+                }
+
+                product_specification_technical_dra {
+                    INTEGER id PK "AUTOINCREMENT"
+                    TEXT Maintains UK "NOT NULL, Unique"
+                    TEXT database "NOT NULL"
+                    TEXT closure "NOT NULL"
+                    TEXT product "NOT NULL"
+                    TEXT specifications "NOT NULL"
+                    TEXT status "NOT NULL"
+                    TEXT created_at "NOT NULL"
+                    TEXT updated_at "NOT NULL"
+                }
+
+                inquiries {
+                    INTEGER id PK "AUTOINCREMENT"
+                    TEXT company_name "NOT NULL"
+                    TEXT contact_person "NOT NULL"
+                    TEXT email "NOT NULL"
+                    TEXT phone "NOT NULL"
+                    TEXT requirement "NOT NULL"
+                    TEXT message "NOT NULL"
+                    TEXT status "NOT NULL"
+                    TEXT created_at "NOT NULL"
+                }
+
+                users ||--o{ product_specification_technical_dra : "creates, updates & manages"
+                users ||--o{ inquiries : "reviews & updates status"
+                product_specification_technical_dra ||--o{ inquiries : "referenced in (logical relation)"
+        </div>
+    </div>
+
+    <!-- Mermaid JS CDN -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        
+        // Initialize Mermaid with dark theme
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'dark',
+            themeVariables: {
+                background: '#1e293b',
+                primaryColor: '#334155',
+                primaryTextColor: '#f8fafc',
+                lineColor: '#38bdf8',
+                secondaryColor: '#0f172a',
+                tertiaryColor: '#1e293b'
+            }
+        });
+
+        // Hide loader when rendering completes
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const loader = document.getElementById('loader');
+                if (loader) loader.style.display = 'none';
+                
+                const diagram = document.getElementById('diagram');
+                if (diagram) diagram.style.visibility = 'visible';
+
+                const svgElement = document.querySelector('.mermaid svg');
+                if (!svgElement) return;
+
+                // Download SVG
+                document.getElementById('download-svg').addEventListener('click', () => {
+                    const svgData = new XMLSerializer().serializeToString(svgElement);
+                    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+                    const svgUrl = URL.createObjectURL(svgBlob);
+                    
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = svgUrl;
+                    downloadLink.download = 'sv_closures_er_diagram.svg';
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+                });
+
+                // Download PNG
+                document.getElementById('download-png').addEventListener('click', () => {
+                    const svgData = new XMLSerializer().serializeToString(svgElement);
+                    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+                    const URL = window.URL || window.webkitURL || window;
+                    const blobURL = URL.createObjectURL(svgBlob);
+                    
+                    const image = new Image();
+                    image.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const bbox = svgElement.getBoundingClientRect();
+                        
+                        // Set 2x scale for high resolution print/download
+                        const scale = 2; 
+                        canvas.width = bbox.width * scale;
+                        canvas.height = bbox.height * scale;
+                        
+                        const context = canvas.getContext('2d');
+                        context.fillStyle = '#1e293b'; // Fill background
+                        context.fillRect(0, 0, canvas.width, canvas.height);
+                        context.scale(scale, scale);
+                        context.drawImage(image, 0, 0);
+                        
+                        const pngUrl = canvas.toDataURL('image/png');
+                        const downloadLink = document.createElement('a');
+                        downloadLink.href = pngUrl;
+                        downloadLink.download = 'sv_closures_er_diagram.png';
+                        document.body.appendChild(downloadLink);
+                        downloadLink.click();
+                        document.body.removeChild(downloadLink);
+                    };
+                    image.src = blobURL;
+                });
+            }, 1200);
+        });
+    </script>
+</body>
+</html>

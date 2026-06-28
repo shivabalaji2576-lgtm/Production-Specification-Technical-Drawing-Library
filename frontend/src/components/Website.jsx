@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Menu, X } from 'lucide-react';
 
 import HomePage from './pages/HomePage';
@@ -58,10 +58,25 @@ function Website() {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const [submitLoading, setSubmitLoading] = useState(false);
 
+  const fetchActiveProducts = async () => {
+    setProductsLoading(true);
+    try {
+      const res = await fetch(`${API_BASE}/product_specification_technical_dra?status=Active&limit=100`);
+      const data = await res.json();
+      if (data.success) setProducts(data.records);
+    } catch (err) {
+      console.error('Error fetching public products:', err);
+    } finally {
+      setProductsLoading(false);
+    }
+  };
+
   // Fetch products and update title when tab changes
   useEffect(() => {
     if (activeTab === 'products') {
-      fetchActiveProducts();
+      setTimeout(() => {
+        fetchActiveProducts();
+      }, 0);
     }
     const matchedItem = navigationItems.find(item => item.id === activeTab);
     if (matchedItem) {
@@ -79,19 +94,6 @@ function Website() {
     window.addEventListener('popstate', handlePopState);
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
-
-  const fetchActiveProducts = async () => {
-    setProductsLoading(true);
-    try {
-      const res = await fetch(`${API_BASE}/product_specification_technical_dra?status=Active&limit=100`);
-      const data = await res.json();
-      if (data.success) setProducts(data.records);
-    } catch (err) {
-      console.error('Error fetching public products:', err);
-    } finally {
-      setProductsLoading(false);
-    }
-  };
 
   const handleInquiryChange = (e) => {
     const { name, value } = e.target;
@@ -128,6 +130,7 @@ function Website() {
         alert(data.message || 'Submission failed. Please try again.');
       }
     } catch (err) {
+      console.error('Error submitting inquiry:', err);
       alert('Error submitting inquiry. Ensure the server is online.');
     } finally {
       setSubmitLoading(false);

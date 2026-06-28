@@ -1,5 +1,3 @@
-import React from 'react';
-
 function GalleryPage() {
   return (
     <section className="section-gallery fade-in">

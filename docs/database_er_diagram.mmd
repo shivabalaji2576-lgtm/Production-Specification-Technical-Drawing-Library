@@ -1,0 +1,38 @@
+erDiagram
+    users {
+        INTEGER id PK "AUTOINCREMENT"
+        TEXT username UK "NOT NULL, Unique"
+        TEXT email UK "NOT NULL, Unique"
+        TEXT password "NOT NULL"
+        TEXT role "NOT NULL DEFAULT 'System Operator'"
+        TEXT created_at "NOT NULL DEFAULT (datetime('now'))"
+        TEXT updated_at "NOT NULL DEFAULT (datetime('now'))"
+    }
+
+    product_specification_technical_dra {
+        INTEGER id PK "AUTOINCREMENT"
+        TEXT Maintains UK "NOT NULL, Unique (Product Code)"
+        TEXT database "NOT NULL (CAD Drawing ID)"
+        TEXT closure "NOT NULL (Dimension Description)"
+        TEXT product "NOT NULL (Product Name/Application)"
+        TEXT specifications "NOT NULL (Tolerances/Materials)"
+        TEXT status "NOT NULL DEFAULT 'Active'"
+        TEXT created_at "NOT NULL DEFAULT (datetime('now'))"
+        TEXT updated_at "NOT NULL DEFAULT (datetime('now'))"
+    }
+
+    inquiries {
+        INTEGER id PK "AUTOINCREMENT"
+        TEXT company_name "NOT NULL"
+        TEXT contact_person "NOT NULL"
+        TEXT email "NOT NULL"
+        TEXT phone "NOT NULL"
+        TEXT requirement "NOT NULL (Product / Spec Code)"
+        TEXT message "NOT NULL"
+        TEXT status "NOT NULL DEFAULT 'New'"
+        TEXT created_at "NOT NULL DEFAULT (datetime('now'))"
+    }
+
+    users ||--o{ product_specification_technical_dra : "creates, updates & manages"
+    users ||--o{ inquiries : "reviews & updates status"
+    product_specification_technical_dra ||--o{ inquiries : "referenced in (logical relation)"

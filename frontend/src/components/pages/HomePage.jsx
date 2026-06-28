@@ -1,4 +1,3 @@
-import React from 'react';
 import { Cpu, Layers, Shield, Award, ArrowRight } from 'lucide-react';
 
 function HomePage({ setActiveTab }) {
