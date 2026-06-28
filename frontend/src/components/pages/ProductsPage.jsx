@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { MessageSquare, Plus, X, AlertCircle, AlertTriangle, CheckCircle, Info, Lock, User } from 'lucide-react';
 
 // Client-side replica of the rules engine for instant live validation alerts
